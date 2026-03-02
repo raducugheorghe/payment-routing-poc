@@ -17,22 +17,23 @@ public class Payment
 
     private Payment() { }
 
-    public Payment(Guid id, Money total, Card card)
+    public static Payment CreatePayment(Money total, Card card)
     {
-        if (id == Guid.Empty)
-            throw new ArgumentException("Payment ID cannot be empty", nameof(id));
-
+        var payment = new Payment();
+        
         if (total == null)
             throw new ArgumentNullException(nameof(total), "Total cannot be null");
 
         if (card == null)
             throw new ArgumentNullException(nameof(card), "Card cannot be null");
 
-        Id = id;
-        Total = total;
-        Card = card;
-        Status = PaymentStatus.Pending;
-        CreatedAt = DateTime.UtcNow;
+        payment.Id = Guid.NewGuid();
+        payment.Total = total;
+        payment.Card = card;
+        payment.Status = PaymentStatus.Pending;
+        payment.CreatedAt = DateTime.UtcNow;
+
+        return payment;
     }
 
     public void Submit()
