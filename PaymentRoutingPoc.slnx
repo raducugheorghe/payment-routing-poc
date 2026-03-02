@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="PaymentRoutingPoc.Api/PaymentRoutingPoc.Api.csproj" />
+  <Project Path="PaymentRoutingPoc.Domain/PaymentRoutingPoc.Domain.csproj" />
+  <Project Path="PaymentRoutingPoc.Infrastructure/PaymentRoutingPoc.Infrastructure.csproj" />
+  <Project Path="PaymentRoutingPoc.UnitTests/PaymentRoutingPoc.UnitTests.csproj" />
+</Solution>
