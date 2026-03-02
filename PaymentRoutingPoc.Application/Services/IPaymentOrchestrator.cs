@@ -1,10 +1,11 @@
+using PaymentRoutingPoc.Domain.Aggregates;
+
 namespace PaymentRoutingPoc.Application.Services;
 
 public interface IPaymentOrchestrator
 {
     Task<PaymentOrchestratorResult> ExecuteWithFallbackAsync(
-        decimal amount,
-        string currency,
+        Payment payment,
         CancellationToken cancellationToken = default);
 }
 
