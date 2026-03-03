@@ -1,0 +1,9 @@
+﻿services:
+  paymentroutingpoc.api:
+    image: paymentroutingpoc.api
+    ports:
+      - 11080:5156
+    build:
+      context: .
+      dockerfile: PaymentRoutingPoc.Api/Dockerfile
+

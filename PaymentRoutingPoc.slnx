@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="compose.yaml" />
+  </Folder>
   <Project Path="PaymentRoutingPoc.Api/PaymentRoutingPoc.Api.csproj" />
   <Project Path="PaymentRoutingPoc.Application/PaymentRoutingPoc.Application.csproj" />
   <Project Path="PaymentRoutingPoc.Domain/PaymentRoutingPoc.Domain.csproj" />
