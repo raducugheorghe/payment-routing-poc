@@ -8,6 +8,8 @@ A small .NET PoC that processes card payments through an application command flo
 
 ## Run
 
+### Option 1: Direct CLI
+
 Bash:
 
 ```bash
@@ -22,10 +24,31 @@ dotnet run --project PaymentRoutingPoc.Api/PaymentRoutingPoc.Api.csproj
 
 API base URL (from launch settings): `http://localhost:5156`
 
+### Option 2: Docker Compose
+
+Bash:
+
+```bash
+docker-compose up
+```
+
+PowerShell:
+
+```powershell
+docker-compose up
+```
+
+API base URL (from launch settings): `http://localhost:11080`
+
 ## Call the API
 
 Flow logs will be printed in the console where the API is running. You can use either of the following options to call the API and trigger the payment processing flow.
 Calling the API multiple times will demonstrate the routing/fallback behavior as the simulated payment gateway randomly fails some requests.
+
+> **Note:** If running the app using Docker Compose, update the port in the API call scripts from `5156` to `11080`.
+
+
+
 
 ### Option 1: JetBrains HTTP client (`.http`)
 
