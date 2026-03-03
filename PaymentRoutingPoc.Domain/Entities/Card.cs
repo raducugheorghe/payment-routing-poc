@@ -4,20 +4,20 @@ public class Card
 {
     // card entity with Id, CardNumber, etc
     public Guid Id { get; private set; }
-    public string Pan { get; private set; }
+    public string CardNumber { get; private set; }
 
     private Card() {
     }
     
-    public static Card CreateCard(string pan)
+    public static Card CreateCard(string cardNumber)
     {
-        if (string.IsNullOrWhiteSpace(pan))
-            throw new ArgumentException("PAN cannot be null or empty", nameof(pan));
+        if (string.IsNullOrWhiteSpace(cardNumber))
+            throw new ArgumentException("Card number cannot be null or empty", nameof(cardNumber));
 
         var card = new Card
         {
             Id = Guid.NewGuid(),
-            Pan = pan
+            CardNumber = cardNumber
         };
 
         return card;

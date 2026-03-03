@@ -10,4 +10,10 @@
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3" />
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\PaymentRoutingPoc.Domain\PaymentRoutingPoc.Domain.csproj" />
+        <ProjectReference Include="..\PaymentRoutingPoc.Application\PaymentRoutingPoc.Application.csproj" />
+        <ProjectReference Include="..\PaymentRoutingPoc.Infrastructure\PaymentRoutingPoc.Infrastructure.csproj" />
+    </ItemGroup>
+
 </Project>

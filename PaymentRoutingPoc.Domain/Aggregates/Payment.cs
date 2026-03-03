@@ -14,6 +14,7 @@ public class Payment
     public PaymentStatus Status { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime? ProcessedAt { get; private set; }
+    public string? ProviderTransactionId { get; private set; }
 
     private Payment() { }
 
@@ -44,7 +45,7 @@ public class Payment
         _domainEvents.Add(new PaymentSubmittedEvent(Id, Total.Amount, Total.Currency));
     }
 
-    public void MarkAsProcessed()
+    public void MarkAsProcessed(string providerTransactionId)
     {
         if (Status == PaymentStatus.Processed)
             throw new InvalidOperationException("Payment is already processed");
@@ -54,6 +55,7 @@ public class Payment
 
         Status = PaymentStatus.Processed;
         ProcessedAt = DateTime.UtcNow;
+        ProviderTransactionId = providerTransactionId;
         _domainEvents.Add(new PaymentSucceededEvent(Id, Total.Amount, Total.Currency));
     }
 

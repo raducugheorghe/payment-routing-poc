@@ -1,6 +1,8 @@
 namespace PaymentRoutingPoc.Domain.Events;
 
-public class PaymentFailedEvent
+using MediatR;
+
+public class PaymentFailedEvent : INotification
 {
     public Guid PaymentId { get; }
     public decimal Amount { get; }

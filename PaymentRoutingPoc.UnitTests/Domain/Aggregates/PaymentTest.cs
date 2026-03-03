@@ -49,7 +49,7 @@ public class PaymentTest
         payment.Submit();
 
         // Act
-        payment.MarkAsProcessed();
+        payment.MarkAsProcessed("provider-tx-123");
 
         // Assert
         Assert.Equal(PaymentStatus.Processed, payment.Status);
