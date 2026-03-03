@@ -57,7 +57,8 @@ public class PaymentTest
             e => e is PaymentSucceededEvent succeededEvent &&
                  succeededEvent.PaymentId == payment.Id &&
                  succeededEvent.Amount == _total.Amount &&
-                 succeededEvent.Currency == _total.Currency);
+                 succeededEvent.Currency == _total.Currency
+                 );
     }
 
     [Fact]

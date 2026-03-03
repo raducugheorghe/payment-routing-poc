@@ -28,6 +28,7 @@
     <ItemGroup>
       <ProjectReference Include="..\PaymentRoutingPoc.Application\PaymentRoutingPoc.Application.csproj" />
       <ProjectReference Include="..\PaymentRoutingPoc.Domain\PaymentRoutingPoc.Domain.csproj" />
+      <ProjectReference Include="..\PaymentRoutingPoc.Infrastructure\PaymentRoutingPoc.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>
