@@ -1,12 +1,11 @@
+namespace PaymentRoutingPoc.Infrastructure.ExtensionMethods;
+
 using Microsoft.Extensions.DependencyInjection;
 using PaymentRoutingPoc.Application.Services;
 using PaymentRoutingPoc.Domain.Repositories;
-using PaymentRoutingPoc.Infrastructure.Psp;
-using PaymentRoutingPoc.Infrastructure.Repositories;
-using PaymentRoutingPoc.Infrastructure.Services;
-using Polly;
-
-namespace PaymentRoutingPoc.Infrastructure.ExtensionMethods;
+using Psp;
+using Repositories;
+using Services;
 
 public static class ServiceCollectionExtensions
 {

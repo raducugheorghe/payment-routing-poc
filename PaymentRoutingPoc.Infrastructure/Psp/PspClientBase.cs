@@ -1,9 +1,9 @@
+namespace PaymentRoutingPoc.Infrastructure.Psp;
+
 using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
-
-namespace PaymentRoutingPoc.Infrastructure.Psp;
 
 public abstract class PspClientBase : IPspClient
 {

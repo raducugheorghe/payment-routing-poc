@@ -1,6 +1,8 @@
 namespace PaymentRoutingPoc.Domain.Events;
 
-public class PaymentSubmittedEvent
+using MediatR;
+
+public class PaymentSubmittedEvent : INotification
 {
     public Guid PaymentId { get; }
     public decimal Amount { get; }

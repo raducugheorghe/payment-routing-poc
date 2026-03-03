@@ -1,7 +1,7 @@
-using PaymentRoutingPoc.Application.DTOs;
-using PaymentRoutingPoc.Domain.Aggregates;
-
 namespace PaymentRoutingPoc.Application.Services;
+
+using Domain.Aggregates;
+using DTOs;
 
 public interface IPaymentOrchestrator
 {

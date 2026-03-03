@@ -1,6 +1,6 @@
-using Microsoft.Extensions.Logging;
-
 namespace PaymentRoutingPoc.Infrastructure.Psp;
+
+using Microsoft.Extensions.Logging;
 
 public class Psp2Client(HttpClient httpClient, ILogger<Psp2Client> logger) : PspClientBase(httpClient, logger)
 {

@@ -1,13 +1,12 @@
-using Microsoft.Extensions.DependencyInjection;
-using PaymentRoutingPoc.Application.DTOs;
-using PaymentRoutingPoc.Domain.Aggregates;
-using Polly.Fallback;
-
 namespace PaymentRoutingPoc.Infrastructure.Services;
 
+using Application.DTOs;
+using Application.Services;
+using Domain.Aggregates;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Polly;
-using Application.Services;
+using Polly.Fallback;
 using Psp;
 
 public class PaymentOrchestrator : IPaymentOrchestrator

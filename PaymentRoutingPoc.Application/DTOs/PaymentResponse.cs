@@ -1,6 +1,6 @@
 namespace PaymentRoutingPoc.Application.DTOs;
 
-using PaymentRoutingPoc.Domain.ValueObjects;
+using Domain.ValueObjects;
 
 public class PaymentResponse
 {
