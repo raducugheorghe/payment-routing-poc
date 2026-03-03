@@ -1,0 +1,15 @@
+@Api_HostAddress = http://localhost:5156
+
+POST {{Api_HostAddress}}/api/payments
+Accept: application/json
+Content-Type: application/json
+
+{
+  "amount": 100.00,
+  "currency": "USD",
+  "paymentMethod": "CreditCard",
+  "cardNumber": "4111111111111111",
+  "merchantId": "123456789"
+}
+
+###

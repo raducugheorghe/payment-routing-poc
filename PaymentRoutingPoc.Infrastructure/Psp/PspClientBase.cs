@@ -58,8 +58,8 @@ public abstract class PspClientBase : IPspClient
                 UseJitter = true,
                 ShouldHandle = 
                     new PredicateBuilder<PspPaymentResponse>()
-                        .Handle<HttpRequestException>()
-                        .Handle<TimeoutException>(),
+                        .HandleInner<HttpRequestException>()
+                        .HandleInner<TimeoutException>(),
                 OnRetry = args =>
                 {
                     logger.LogWarning(
@@ -70,7 +70,6 @@ public abstract class PspClientBase : IPspClient
                     return default;
                 }
             })
-            .AddTimeout(TimeSpan.FromSeconds(10))
             .Build();
     }
 }

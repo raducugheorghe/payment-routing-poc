@@ -1,12 +1,31 @@
+using PaymentRoutingPoc.Application.Commands;
+using PaymentRoutingPoc.Application.DTOs;
+using PaymentRoutingPoc.Infrastructure.EventHandlers;
+using PaymentRoutingPoc.Infrastructure.ExtensionMethods;
+using PaymentRoutingPoc.Infrastructure.Psp;
+using MediatR;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+// Add services to the container
 builder.Services.AddOpenApi();
+builder.Services.AddLogging();
+
+// Register MediatR
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssemblyContaining(typeof(CreatePaymentCommand));
+    cfg.RegisterServicesFromAssemblyContaining(typeof(PaymentSucceededEventHandler));
+});
+
+builder.Services.AddInfrastructure();
+
+
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -14,64 +33,73 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapPost("/psp1", async (PaymentRequest request) =>
+app.MapPost("/psp1", async (PspPaymentRequest request) =>
         {
-            // Simulate processing the payment request with PSP1
+            // Simulate processing the payment request with PSP1, fail rate of 50%
             var shouldFail = Random.Shared.Next(2) == 0;
-            
+
             if (shouldFail)
             {
-                // simulate processing time with a random delay between 1 and 30s
-                var delay = Random.Shared.Next(1000, 30000);
+                // simulate processing time with a random delay between 1 and 6s
+                var delay = Random.Shared.Next(1000, 6000);
                 await Task.Delay(delay);
-                
-                return Results.BadRequest(new PaymentResponse
+
+                return Results.BadRequest(new PspPaymentResponse
                 {
-                    Success = false,
+                    IsSuccess = false,
                     Message = "Payment processing failed with PSP1"
                 });
             }
-            
-            var response = new PaymentResponse
+
+            var response = new PspPaymentResponse
             {
-                Success = true,
+                IsSuccess = true,
+                TransactionId = Guid.NewGuid().ToString(),
                 Message = "Payment processed successfully with PSP1"
         };
-            
+
         return Results.Ok(response);
     })
     .WithName("ProcessPaymentWithPSP1");
 
-app.MapPost("/psp2", (PaymentRequest request) =>
+app.MapPost("/psp2", (PspPaymentRequest request) =>
     {
-        // Simulate processing the payment request with PSP2
-        var response = new PaymentResponse
+        // Simulate processing the payment request with PSP2, fail rate of 50%
+        var shouldFail = Random.Shared.Next(2) == 0;
+
+        if (shouldFail)
         {
-            Success = true,
+            return Results.BadRequest(new PspPaymentResponse
+            {
+                IsSuccess = false,
+                Message = "Payment processing failed with PSP2"
+            });
+        }
+
+        var response = new PspPaymentResponse
+        {
+            IsSuccess = true,
+            TransactionId = Guid.NewGuid().ToString(),
             Message = "Payment processed successfully with PSP2"
         };
+
         return Results.Ok(response);
     })
     .WithName("ProcessPaymentWithPSP2");
 
-app.MapPost("/api/payments", (PaymentRequest request) =>
-{
-    
-});
+app.MapPost("/api/payments", async (CreatePaymentRequest request, IMediator mediator) =>
+    {
+        var command = new CreatePaymentCommand(
+            request.Amount,
+            request.Currency,
+            request.CardNumber,
+            request.MerchantId);
+        
+        var result = await mediator.Send(command);
+        
+        return Results.Ok(result);
+    })
+    .WithName("ProcessPayment");
 
 app.Run();
 
-
-public class PaymentRequest
-{
-    public required decimal Amount { get; set; }
-    public required string Currency { get; set; }
-    public required string CardNumber { get; set; }
-    public Guid MerchantId { get; set; } = Guid.NewGuid();
-}
-
-public class PaymentResponse
-{
-    public bool Success { get; set; }
-    public string Message { get; set; }
-}

@@ -13,17 +13,22 @@ public static class ServiceCollectionExtensions
     {
         services.AddHttpClient<Psp1Client>(c=>
         {
-            c.BaseAddress = new Uri("https://localhost:5001/");
+            c.BaseAddress = new Uri("http://localhost:5156/");
+            c.Timeout = TimeSpan.FromSeconds(3);
         });
         
         services.AddHttpClient<Psp2Client>(c=>
         {
-            c.BaseAddress = new Uri("https://localhost:5001/");
+            c.BaseAddress = new Uri("http://localhost:5156/");
+            c.Timeout = TimeSpan.FromSeconds(3);
         });
-
+        
+        services.AddTransient<IPspClient, Psp1Client>();
+        services.AddTransient<IPspClient, Psp2Client>();
+        
         services.AddSingleton<IPaymentRepository, InMemoryPaymentRepository>();
 
-        services.AddScoped<IPaymentOrchestrator, PaymentOrchestrator>();
+        services.AddTransient<IPaymentOrchestrator, PaymentOrchestrator>();
         
         return services;
     }

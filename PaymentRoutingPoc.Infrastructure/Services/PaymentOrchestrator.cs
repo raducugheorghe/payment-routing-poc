@@ -75,7 +75,7 @@ public class PaymentOrchestrator : IPaymentOrchestrator
 
             if (pspPaymentResponse.IsSuccess)
             {
-                _logger.LogInformation("Payment successful: {TransactionId}", pspPaymentResponse.TransactionId);
+                _logger.LogInformation("Payment successful: {TransactionId}. {Message}", pspPaymentResponse.TransactionId, pspPaymentResponse.Message);
                 return new PaymentOrchestratorResult
                 {
                     IsSuccess = true,
@@ -111,8 +111,8 @@ public class PaymentOrchestrator : IPaymentOrchestrator
             .AddFallback(new FallbackStrategyOptions<PspPaymentResponse>
             {
                 ShouldHandle = new PredicateBuilder<PspPaymentResponse>()
-                    .Handle<HttpRequestException>()
-                    .Handle<TimeoutException>()
+                    .HandleInner<TimeoutException>()
+                    .HandleInner<HttpRequestException>()
                     .HandleResult(r => !r.IsSuccess),
                 FallbackAction = async (context) =>
                 {
