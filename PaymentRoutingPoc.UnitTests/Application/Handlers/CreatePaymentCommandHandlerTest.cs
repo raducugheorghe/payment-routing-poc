@@ -1,6 +1,7 @@
 using MediatR;
 using Moq;
 using PaymentRoutingPoc.Application.Commands;
+using PaymentRoutingPoc.Application.DTOs;
 using PaymentRoutingPoc.Application.Handlers;
 using PaymentRoutingPoc.Application.Services;
 using PaymentRoutingPoc.Domain.Aggregates;

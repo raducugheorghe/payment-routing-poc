@@ -1,7 +1,7 @@
 namespace PaymentRoutingPoc.Application.Commands;
 
-using MediatR;
 using DTOs;
+using MediatR;
 
 public class CreatePaymentCommand : IRequest<PaymentResponse>
 {

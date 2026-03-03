@@ -1,12 +1,12 @@
 namespace PaymentRoutingPoc.Application.Handlers;
 
-using MediatR;
 using Commands;
-using DTOs;
 using Domain.Aggregates;
 using Domain.Entities;
 using Domain.Repositories;
 using Domain.ValueObjects;
+using DTOs;
+using MediatR;
 using Services;
 
 public class CreatePaymentCommandHandler : IRequestHandler<CreatePaymentCommand, PaymentResponse>
@@ -52,7 +52,7 @@ public class CreatePaymentCommandHandler : IRequestHandler<CreatePaymentCommand,
         
         if (orchestrationResult.IsSuccess)
         {
-            payment.MarkAsProcessed();
+            payment.MarkAsProcessed(orchestrationResult.ProviderTransactionId);
         }
         else
         {
