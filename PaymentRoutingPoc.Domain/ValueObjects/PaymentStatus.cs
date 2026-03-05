@@ -4,9 +4,9 @@ using ValueOf;
 
 public class PaymentStatus : ValueOf<int, PaymentStatus>
 {
-    public const int PendingValue = 0;
-    public const int ProcessedValue = 1;
-    public const int FailedValue = 2;
+    private const int PendingValue = 0;
+    private const int ProcessedValue = 1;
+    private const int FailedValue = 2;
 
     private static readonly IReadOnlyDictionary<int, IReadOnlySet<int>> AllowedTransitions =
         new Dictionary<int, IReadOnlySet<int>>

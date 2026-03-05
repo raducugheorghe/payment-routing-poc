@@ -2,7 +2,6 @@ namespace PaymentRoutingPoc.Application.Handlers;
 
 using Commands;
 using Domain.Aggregates;
-using Domain.Entities;
 using Domain.Repositories;
 using Domain.ValueObjects;
 using DTOs;
@@ -12,15 +11,18 @@ using Services;
 public class CreatePaymentCommandHandler : IRequestHandler<CreatePaymentCommand, PaymentResponse>
 {
     private readonly IPaymentRepository _paymentRepository;
+    private readonly ICardRepository _cardRepository;
     private readonly IPaymentOrchestrator _paymentOrchestrator;
     private readonly IPublisher _mediator;
 
     public CreatePaymentCommandHandler(
         IPaymentRepository paymentRepository,
+        ICardRepository cardRepository,
         IPaymentOrchestrator paymentOrchestrator,
         IPublisher mediator)
     {
         _paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
+        _cardRepository = cardRepository;
         _paymentOrchestrator = paymentOrchestrator ?? throw new ArgumentNullException(nameof(paymentOrchestrator));
         _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
     }
@@ -31,8 +33,15 @@ public class CreatePaymentCommandHandler : IRequestHandler<CreatePaymentCommand,
     {
         var money = Money.From((request.Amount, request.Currency));
         
-        //TODO: load card details from repository instead of creating a new one with just the number
-        var card = Card.CreateCard(request.CardNumber);
+        var card = await _cardRepository.GetByCardNumberAsync(request.CardNumber, cancellationToken);
+        if (card == null)
+        {
+            return new PaymentResponse
+            {
+                Status = PaymentStatus.Failed,
+                Message = "Card not found"
+            };
+        }
         
         var payment = Payment.CreatePayment(money, card);
         payment.Submit();

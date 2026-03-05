@@ -5,6 +5,7 @@ using PaymentRoutingPoc.Application.DTOs;
 using PaymentRoutingPoc.Application.Handlers;
 using PaymentRoutingPoc.Application.Services;
 using PaymentRoutingPoc.Domain.Aggregates;
+using PaymentRoutingPoc.Domain.Entities;
 using PaymentRoutingPoc.Domain.Repositories;
 using PaymentRoutingPoc.Domain.ValueObjects;
 
@@ -15,6 +16,7 @@ public class CreatePaymentCommandHandlerTest
 
     private readonly CreatePaymentCommandHandler _handler;
     private readonly Mock<IPaymentRepository> _mockPaymentRepository = new();
+    private readonly Mock<ICardRepository> _mockCardRepository = new();
     private readonly Mock<IPaymentOrchestrator> _mockPaymentOrchestrator = new();
     private readonly Mock<IPublisher> _mockMediator = new();
     
@@ -22,8 +24,12 @@ public class CreatePaymentCommandHandlerTest
     {
         _handler = new CreatePaymentCommandHandler(
             _mockPaymentRepository.Object, 
+            _mockCardRepository.Object,
             _mockPaymentOrchestrator.Object, 
             _mockMediator.Object);
+        
+            _mockCardRepository.Setup(cr => cr.GetByCardNumberAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((string cardNumber, CancellationToken ct) => Card.CreateCard(cardNumber));
     }
     
     [Fact]

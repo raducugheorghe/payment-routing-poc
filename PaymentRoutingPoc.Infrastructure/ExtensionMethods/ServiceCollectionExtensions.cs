@@ -35,6 +35,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IPspClient, Psp2Client>();
         
         services.AddSingleton<IPaymentRepository, InMemoryPaymentRepository>();
+        services.AddSingleton<ICardRepository, InMemoryCardRepository>();
 
         services.AddTransient<IPaymentOrchestrator, PaymentOrchestrator>();
         

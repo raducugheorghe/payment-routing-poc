@@ -4,11 +4,10 @@ using Entities;
 using Events;
 using ValueObjects;
 
-public class Payment
+public class Payment: EntityBase
 {
     private readonly List<object> _domainEvents = [];
-
-    public Guid Id { get; private set; }
+    
     public Money Total { get; private set; }
     public Card Card { get; private set; }
     public PaymentStatus Status { get; private set; }
