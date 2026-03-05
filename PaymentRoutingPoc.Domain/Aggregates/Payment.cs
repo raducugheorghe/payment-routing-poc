@@ -47,13 +47,7 @@ public class Payment
 
     public void MarkAsProcessed(string providerTransactionId)
     {
-        if (Status == PaymentStatus.Processed)
-            throw new InvalidOperationException("Payment is already processed");
-
-        if (Status == PaymentStatus.Failed)
-            throw new InvalidOperationException("Cannot process a failed payment");
-
-        Status = PaymentStatus.Processed;
+        Status = Status.TransitionTo(PaymentStatus.Processed);
         ProcessedAt = DateTime.UtcNow;
         ProviderTransactionId = providerTransactionId;
         _domainEvents.Add(new PaymentSucceededEvent(Id, Total.Amount, Total.Currency));
@@ -61,13 +55,7 @@ public class Payment
 
     public void MarkAsFailed(string reason)
     {
-        if (Status == PaymentStatus.Failed)
-            throw new InvalidOperationException("Payment is already marked as failed");
-
-        if (Status == PaymentStatus.Processed)
-            throw new InvalidOperationException("Cannot fail a processed payment");
-
-        Status = PaymentStatus.Failed;
+        Status = Status.TransitionTo(PaymentStatus.Failed);
         ProcessedAt = DateTime.UtcNow;
         _domainEvents.Add(new PaymentFailedEvent(Id, Total.Amount, Total.Currency, reason));
     }
