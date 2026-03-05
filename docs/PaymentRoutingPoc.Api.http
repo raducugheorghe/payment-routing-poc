@@ -9,7 +9,7 @@ Content-Type: application/json
   "currency": "USD",
   "paymentMethod": "CreditCard",
   "cardNumber": "4111111111111111",
-  "merchantId": "123456789"
+  "merchantId": "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"
 }
 
 ###

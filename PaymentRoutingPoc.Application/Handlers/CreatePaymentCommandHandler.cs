@@ -12,12 +12,14 @@ public class CreatePaymentCommandHandler : IRequestHandler<CreatePaymentCommand,
 {
     private readonly IPaymentRepository _paymentRepository;
     private readonly ICardRepository _cardRepository;
+    private readonly IMerchantRepository _merchantRepository;
     private readonly IPaymentOrchestrator _paymentOrchestrator;
     private readonly IPublisher _mediator;
 
     public CreatePaymentCommandHandler(
         IPaymentRepository paymentRepository,
         ICardRepository cardRepository,
+        IMerchantRepository merchantRepository,
         IPaymentOrchestrator paymentOrchestrator,
         IPublisher mediator)
     {
@@ -25,6 +27,7 @@ public class CreatePaymentCommandHandler : IRequestHandler<CreatePaymentCommand,
         _cardRepository = cardRepository;
         _paymentOrchestrator = paymentOrchestrator ?? throw new ArgumentNullException(nameof(paymentOrchestrator));
         _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+        _merchantRepository = merchantRepository;
     }
 
     public async Task<PaymentResponse> Handle(
@@ -43,7 +46,17 @@ public class CreatePaymentCommandHandler : IRequestHandler<CreatePaymentCommand,
             };
         }
         
-        var payment = Payment.CreatePayment(money, card);
+        var merchant = await _merchantRepository.GetByIdAsync(request.MerchantId, cancellationToken); // Assuming merchant validation is done elsewhere
+        if(merchant == null)
+        {
+            return new PaymentResponse
+            {
+                Status = PaymentStatus.Failed,
+                Message = "Merchant not found"
+            };
+        }
+        
+        var payment = Payment.CreatePayment(money, card, merchant);
         payment.Submit();
 
         // Save initial state

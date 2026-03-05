@@ -74,7 +74,7 @@ Bash:
 curl -X POST http://localhost:5156/api/payments \
   -H "Accept: application/json" \
   -H "Content-Type: application/json" \
-  -d '{"amount":100.00,"currency":"USD","paymentMethod":"CreditCard","cardNumber":"4111111111111111","merchantId":"123456789"}'
+  -d '{"amount":100.00,"currency":"USD","paymentMethod":"CreditCard","cardNumber":"4111111111111111","merchantId":"FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"}'
 ```
 
 PowerShell:
@@ -85,7 +85,7 @@ $body = @{
   currency = "USD"
   paymentMethod = "CreditCard"
   cardNumber = "4111111111111111"
-  merchantId = "123456789"
+  merchantId = "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"
 } | ConvertTo-Json
 
 Invoke-RestMethod -Method Post `

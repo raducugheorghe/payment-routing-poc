@@ -14,7 +14,10 @@ public class PaymentOrchestratorTest
     private readonly Mock<ILogger<PaymentOrchestrator>> _logger = new();
     private readonly Mock<IPspClient> _pspClient1 = new();
     private readonly Mock<IPspClient> _pspClient2 = new();
-    private readonly Payment _payment = Payment.CreatePayment(Money.From((100m, "USD")), Card.CreateCard("4111111111111111"));
+    private readonly Payment _payment = Payment.CreatePayment(
+        Money.From((100m, "USD")), 
+        Card.CreateCard("4111111111111111"),
+        Merchant.LoadMerchant(Guid.NewGuid(), "Test Merchant"));
 
     public PaymentOrchestratorTest()
     {

@@ -10,6 +10,7 @@ public class Payment: EntityBase
     
     public Money Total { get; private set; }
     public Card Card { get; private set; }
+    public Merchant Merchant { get; private set; }
     public PaymentStatus Status { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime? ProcessedAt { get; private set; }
@@ -17,7 +18,7 @@ public class Payment: EntityBase
 
     private Payment() { }
 
-    public static Payment CreatePayment(Money total, Card card)
+    public static Payment CreatePayment(Money total, Card card, Merchant merchant)
     {
         var payment = new Payment();
         
@@ -26,10 +27,14 @@ public class Payment: EntityBase
 
         if (card == null)
             throw new ArgumentNullException(nameof(card), "Card cannot be null");
+        
+        if (merchant == null)
+            throw new ArgumentNullException(nameof(merchant), "Merchant cannot be null");
 
         payment.Id = Guid.NewGuid();
         payment.Total = total;
         payment.Card = card;
+        payment.Merchant = merchant;
         payment.Status = PaymentStatus.Pending;
         payment.CreatedAt = DateTime.UtcNow;
 

@@ -89,11 +89,17 @@ app.MapPost("/psp2", (PspPaymentRequest request) =>
 
 app.MapPost("/api/payments", async (CreatePaymentRequest request, IMediator mediator) =>
     {
+        if(!Guid.TryParse(request.MerchantId, out var merchantId))
+        {
+            return Results.BadRequest("Invalid MerchantId");
+        }
+        
+        
         var command = new CreatePaymentCommand(
             request.Amount,
             request.Currency,
             request.CardNumber,
-            request.MerchantId);
+            merchantId);
         
         var result = await mediator.Send(command);
         

@@ -9,12 +9,13 @@ public class PaymentTest
 {
     private readonly Card _card = Card.CreateCard("test pan");
     private readonly Money _total = Money.From((100.00m, "USD"));
+    private readonly Merchant _merchant = Merchant.CreateMerchant("test merchant");
     
     [Fact]
     public void CreatePayment_ShouldInitializeProperties()
     {
         // Arrange & Act
-        var payment = Payment.CreatePayment(_total, _card);
+        var payment = Payment.CreatePayment(_total, _card, _merchant);
 
         // Assert
         Assert.NotNull(payment);
@@ -27,7 +28,7 @@ public class PaymentTest
     public void Submit_ShouldAddPaymentSubmittedEvent()
     {
         // Arrange
-        var payment = Payment.CreatePayment(_total, _card);
+        var payment = Payment.CreatePayment(_total, _card, _merchant);
 
         // Act
         payment.Submit();
@@ -45,7 +46,7 @@ public class PaymentTest
     public void MarkAsProcessed_ShouldUpdateStatusAndAddPaymentSucceededEvent()
     {
         // Arrange
-        var payment = Payment.CreatePayment(_total, _card);
+        var payment = Payment.CreatePayment(_total, _card, _merchant);
         payment.Submit();
 
         // Act
@@ -65,7 +66,7 @@ public class PaymentTest
     public void MarkAsFailed_ShouldUpdateStatusAndAddPaymentFailedEvent()
     {
         // Arrange
-        var payment = Payment.CreatePayment(_total, _card);
+        var payment = Payment.CreatePayment(_total, _card, _merchant);
         payment.Submit();
 
         // Act

@@ -36,6 +36,7 @@ public static class ServiceCollectionExtensions
         
         services.AddSingleton<IPaymentRepository, InMemoryPaymentRepository>();
         services.AddSingleton<ICardRepository, InMemoryCardRepository>();
+        services.AddSingleton<IMerchantRepository, InMemoryMerchantRepository>();
 
         services.AddTransient<IPaymentOrchestrator, PaymentOrchestrator>();
         

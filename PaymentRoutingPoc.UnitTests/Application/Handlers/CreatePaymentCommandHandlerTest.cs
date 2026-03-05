@@ -17,6 +17,7 @@ public class CreatePaymentCommandHandlerTest
     private readonly CreatePaymentCommandHandler _handler;
     private readonly Mock<IPaymentRepository> _mockPaymentRepository = new();
     private readonly Mock<ICardRepository> _mockCardRepository = new();
+    private readonly Mock<IMerchantRepository> _mockMerchantRepository = new();
     private readonly Mock<IPaymentOrchestrator> _mockPaymentOrchestrator = new();
     private readonly Mock<IPublisher> _mockMediator = new();
     
@@ -25,18 +26,21 @@ public class CreatePaymentCommandHandlerTest
         _handler = new CreatePaymentCommandHandler(
             _mockPaymentRepository.Object, 
             _mockCardRepository.Object,
+            _mockMerchantRepository.Object,
             _mockPaymentOrchestrator.Object, 
             _mockMediator.Object);
         
             _mockCardRepository.Setup(cr => cr.GetByCardNumberAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((string cardNumber, CancellationToken ct) => Card.CreateCard(cardNumber));
+            _mockMerchantRepository.Setup(mr => mr.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((Guid merchantId, CancellationToken ct) => Merchant.LoadMerchant(Guid.NewGuid(), "Test Merchant"));
     }
     
     [Fact]
     public async Task Handle_ShouldReturnPaymentResponse_WhenPaymentSuccess()
     {
         // Arrange
-        var command = new CreatePaymentCommand(100, "USD", "4111111111111111", "merchant123");
+        var command = new CreatePaymentCommand(100, "USD", "4111111111111111", Guid.NewGuid());
         
         _mockPaymentOrchestrator
             .Setup(x => x.ExecuteWithFallbackAsync(It.IsAny<Payment>(), It.IsAny<CancellationToken>()))
@@ -55,7 +59,7 @@ public class CreatePaymentCommandHandlerTest
     public async Task Handle_ShouldReturnPaymentResponse_WhenPaymentFails()
     {
         // Arrange
-        var command = new CreatePaymentCommand(100, "USD", "411111111111", "merchant123");
+        var command = new CreatePaymentCommand(100, "USD", "411111111111", Guid.NewGuid());
 
         _mockPaymentOrchestrator
             .Setup(x => x.ExecuteWithFallbackAsync(It.IsAny<Payment>(), It.IsAny<CancellationToken>()))
