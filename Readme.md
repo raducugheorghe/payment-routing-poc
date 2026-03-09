@@ -2,6 +2,38 @@
 
 A small .NET PoC that processes card payments through an application command flow and demonstrates payment routing/fallback behavior.
 
+## Persistence Layer
+
+The solution now uses an Event Sourcing + CQRS persistence model:
+
+- `Write DB` (`payment-write.db`): immutable event store + snapshots + command-side reference data.
+- `Read DB` (`payment-read.db`): denormalized read tables + projection checkpoints.
+- `ProjectionProcessor`: consumes pending events from write DB and updates read models idempotently.
+
+Key implementation projects:
+
+- `PaymentRoutingPoc.Persistence`: DbContexts, event repository, serializer, projections, migrations.
+- `PaymentRoutingPoc.Infrastructure`: domain repository adapters and event handlers that trigger projections.
+
+## Persistence Configuration
+
+Persistence services are wired in:
+
+- `PaymentRoutingPoc.Infrastructure/ExtensionMethods/ServiceCollectionExtensions.cs`
+- `PaymentRoutingPoc.Persistence/Configuration/PersistenceServiceCollectionExtensions.cs`
+
+On startup, the API runs database initialization:
+
+- `await app.Services.InitializeDatabasesAsync();`
+
+You can process pending projections manually from a scoped `IServiceProvider` via:
+
+- `await serviceProvider.ProcessPendingProjectionsAsync();`
+
+Operational details are documented in `docs/runbooks/PERSISTENCE_OPERATIONS_RUNBOOK.md`.
+
+Migration notes are tracked in `docs/migrations/`.
+
 ## Prerequisites
 
 - .NET SDK `10.0.x` (the project targets `net10.0`)
@@ -72,6 +104,7 @@ Bash:
 
 ```bash
 curl -X POST http://localhost:5156/api/payments \
+  -H "Idempotency-Key: 11111111-2222-3333-4444-555555555555" \
   -H "Accept: application/json" \
   -H "Content-Type: application/json" \
   -d '{"amount":100.00,"currency":"USD","paymentMethod":"CreditCard","cardNumber":"4111111111111111","merchantId":"FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"}'
@@ -91,6 +124,8 @@ $body = @{
 Invoke-RestMethod -Method Post `
   -Uri "http://localhost:5156/api/payments" `
   -ContentType "application/json" `
-  -Headers @{ Accept = "application/json" } `
+  -Headers @{ Accept = "application/json"; "Idempotency-Key" = "11111111-2222-3333-4444-555555555555" } `
   -Body $body
 ```
+
+Repeated requests with the same idempotency key return the previously processed payment result.

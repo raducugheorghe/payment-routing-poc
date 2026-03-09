@@ -80,7 +80,8 @@ public class PaymentOrchestrator : IPaymentOrchestrator
                 {
                     IsSuccess = true,
                     Message = "Payment processed successfully via " + (pspPaymentResponse.Message ?? "Unknown"),
-                    ProviderTransactionId =  pspPaymentResponse.TransactionId
+                    ProviderTransactionId =  pspPaymentResponse.TransactionId,
+                    ProviderName = pspPaymentResponse.Message ?? "Unknown"
                 };
             }
 

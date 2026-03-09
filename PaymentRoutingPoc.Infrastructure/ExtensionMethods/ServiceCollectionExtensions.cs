@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using PaymentRoutingPoc.Persistence.Configuration;
 
 namespace PaymentRoutingPoc.Infrastructure.ExtensionMethods;
 
@@ -14,6 +15,8 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddPersistenceLayer(configuration);
+
         services.Configure<PspOptions<Psp1Client>>(configuration.GetSection($"{nameof(PspOptions<>)}:{nameof(Psp1Client)}"));
         services.Configure<PspOptions<Psp2Client>>(configuration.GetSection($"{nameof(PspOptions<>)}:{nameof(Psp2Client)}"));
         
@@ -34,9 +37,9 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IPspClient, Psp1Client>();
         services.AddTransient<IPspClient, Psp2Client>();
         
-        services.AddSingleton<IPaymentRepository, InMemoryPaymentRepository>();
-        services.AddSingleton<ICardRepository, InMemoryCardRepository>();
-        services.AddSingleton<IMerchantRepository, InMemoryMerchantRepository>();
+        services.AddScoped<IPaymentRepository, EventSourcedPaymentRepository>();
+        services.AddScoped<ICardRepository, CardRepository>();
+        services.AddScoped<IMerchantRepository, MerchantRepository>();
 
         services.AddTransient<IPaymentOrchestrator, PaymentOrchestrator>();
         

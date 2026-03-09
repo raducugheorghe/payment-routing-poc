@@ -9,6 +9,7 @@
     <ItemGroup>
         <ProjectReference Include="..\PaymentRoutingPoc.Domain\PaymentRoutingPoc.Domain.csproj" />
         <ProjectReference Include="..\PaymentRoutingPoc.Application\PaymentRoutingPoc.Application.csproj" />
+        <ProjectReference Include="..\PaymentRoutingPoc.Persistence\PaymentRoutingPoc.Persistence.csproj" />
     </ItemGroup>
     
     <ItemGroup>

@@ -9,17 +9,20 @@ public class CreatePaymentCommand : IRequest<PaymentResponse>
     public string Currency { get; set; }
     public string CardNumber { get; set; }
     public Guid MerchantId { get; set; }
+    public string? IdempotencyKey { get; set; }
 
     public CreatePaymentCommand(
         decimal amount,
         string currency,
         string cardNumber,
-        Guid merchantId)
+        Guid merchantId,
+        string? idempotencyKey = null)
     {
         Amount = amount;
         Currency = currency;
         CardNumber = cardNumber;
         MerchantId = merchantId;
+        IdempotencyKey = idempotencyKey;
     }
 }
 

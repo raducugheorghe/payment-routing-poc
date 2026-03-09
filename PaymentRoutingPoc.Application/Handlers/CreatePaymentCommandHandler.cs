@@ -14,19 +14,16 @@ public class CreatePaymentCommandHandler : IRequestHandler<CreatePaymentCommand,
     private readonly ICardRepository _cardRepository;
     private readonly IMerchantRepository _merchantRepository;
     private readonly IPaymentOrchestrator _paymentOrchestrator;
-    private readonly IPublisher _mediator;
 
     public CreatePaymentCommandHandler(
         IPaymentRepository paymentRepository,
         ICardRepository cardRepository,
         IMerchantRepository merchantRepository,
-        IPaymentOrchestrator paymentOrchestrator,
-        IPublisher mediator)
+        IPaymentOrchestrator paymentOrchestrator)
     {
         _paymentRepository = paymentRepository ?? throw new ArgumentNullException(nameof(paymentRepository));
         _cardRepository = cardRepository;
         _paymentOrchestrator = paymentOrchestrator ?? throw new ArgumentNullException(nameof(paymentOrchestrator));
-        _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         _merchantRepository = merchantRepository;
     }
 
@@ -34,6 +31,20 @@ public class CreatePaymentCommandHandler : IRequestHandler<CreatePaymentCommand,
         CreatePaymentCommand request,
         CancellationToken cancellationToken)
     {
+        if (!string.IsNullOrWhiteSpace(request.IdempotencyKey))
+        {
+            var existingPayment = await _paymentRepository.GetByIdempotencyKeyAsync(request.IdempotencyKey, cancellationToken);
+            if (existingPayment != null)
+            {
+                return new PaymentResponse
+                {
+                    PaymentId = existingPayment.Id,
+                    Status = existingPayment.Status,
+                    Message = "Payment request already processed"
+                };
+            }
+        }
+
         var money = Money.From((request.Amount, request.Currency));
         
         var card = await _cardRepository.GetByCardNumberAsync(request.CardNumber, cancellationToken);
@@ -59,37 +70,22 @@ public class CreatePaymentCommandHandler : IRequestHandler<CreatePaymentCommand,
         var payment = Payment.CreatePayment(money, card, merchant);
         payment.Submit();
 
-        // Save initial state
-        await _paymentRepository.SaveAsync(payment, cancellationToken);
-
-        // Publish submitted events
-        foreach (var domainEvent in payment.GetDomainEvents())
-        {
-            await _mediator.Publish(domainEvent, cancellationToken);
-        }
-        payment.ClearDomainEvents();
+        // Persist create transition with optional idempotency key.
+        await _paymentRepository.SaveAsync(payment, request.IdempotencyKey, cancellationToken);
 
         // Execute payment with fallback
         var orchestrationResult = await _paymentOrchestrator.ExecuteWithFallbackAsync(payment, cancellationToken);
         
         if (orchestrationResult.IsSuccess)
         {
-            payment.MarkAsProcessed(orchestrationResult.ProviderTransactionId);
+            payment.MarkAsProcessed(orchestrationResult.ProviderTransactionId, orchestrationResult.ProviderName);
         }
         else
         {
             payment.MarkAsFailed(orchestrationResult.Message);
         }
 
-        // Save final state
-        await _paymentRepository.SaveAsync(payment, cancellationToken);
-
-        // Publish final events
-        foreach (var domainEvent in payment.GetDomainEvents())
-        {
-            await _mediator.Publish(domainEvent, cancellationToken);
-        }
-        payment.ClearDomainEvents();
+        await _paymentRepository.SaveAsync(payment, cancellationToken: cancellationToken);
 
         return new PaymentResponse
         {

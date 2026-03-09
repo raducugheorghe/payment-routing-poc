@@ -114,9 +114,9 @@ public class PaymentOrchestratorTest
                 x => x.Log(
                     LogLevel.Information,
                     It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("PSP1 failed")),
-                    It.IsAny<Exception>(),
-                    It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+                    It.Is<It.IsAnyType>((v, t) => (v != null ? v.ToString()! : string.Empty).Contains("PSP1 failed")),
+                    It.IsAny<Exception?>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
                 Times.Once);
     }
     

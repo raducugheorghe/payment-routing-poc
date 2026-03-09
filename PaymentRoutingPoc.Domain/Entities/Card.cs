@@ -38,4 +38,21 @@ public class Card : EntityBase
 
         return card;
     }
+
+    public string GetLast4()
+    {
+        var digits = new string(CardNumber.Where(char.IsDigit).ToArray());
+        if (digits.Length < 4)
+            throw new InvalidOperationException("Card number must contain at least 4 digits");
+
+        return digits[^4..];
+    }
+
+    public static string BuildMaskedFromLast4(string last4)
+    {
+        if (string.IsNullOrWhiteSpace(last4) || last4.Length != 4 || !last4.All(char.IsDigit))
+            throw new ArgumentException("Card last4 must be exactly 4 digits", nameof(last4));
+
+        return $"**** **** **** {last4}";
+    }
 }

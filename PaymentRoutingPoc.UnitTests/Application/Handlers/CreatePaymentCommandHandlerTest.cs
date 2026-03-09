@@ -1,4 +1,3 @@
-using MediatR;
 using Moq;
 using PaymentRoutingPoc.Application.Commands;
 using PaymentRoutingPoc.Application.DTOs;
@@ -19,7 +18,6 @@ public class CreatePaymentCommandHandlerTest
     private readonly Mock<ICardRepository> _mockCardRepository = new();
     private readonly Mock<IMerchantRepository> _mockMerchantRepository = new();
     private readonly Mock<IPaymentOrchestrator> _mockPaymentOrchestrator = new();
-    private readonly Mock<IPublisher> _mockMediator = new();
     
     public CreatePaymentCommandHandlerTest()
     {
@@ -27,13 +25,15 @@ public class CreatePaymentCommandHandlerTest
             _mockPaymentRepository.Object, 
             _mockCardRepository.Object,
             _mockMerchantRepository.Object,
-            _mockPaymentOrchestrator.Object, 
-            _mockMediator.Object);
+            _mockPaymentOrchestrator.Object);
         
             _mockCardRepository.Setup(cr => cr.GetByCardNumberAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((string cardNumber, CancellationToken ct) => Card.CreateCard(cardNumber));
             _mockMerchantRepository.Setup(mr => mr.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((Guid merchantId, CancellationToken ct) => Merchant.LoadMerchant(Guid.NewGuid(), "Test Merchant"));
+
+            _mockPaymentRepository.Setup(pr => pr.GetByIdempotencyKeyAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((Payment?)null);
     }
     
     [Fact]
@@ -44,7 +44,12 @@ public class CreatePaymentCommandHandlerTest
         
         _mockPaymentOrchestrator
             .Setup(x => x.ExecuteWithFallbackAsync(It.IsAny<Payment>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new PaymentOrchestratorResult{ IsSuccess = true });
+            .ReturnsAsync(new PaymentOrchestratorResult
+            {
+                IsSuccess = true,
+                ProviderTransactionId = "tx-1",
+                ProviderName = "PSP1"
+            });
         
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);

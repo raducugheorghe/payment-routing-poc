@@ -7,7 +7,7 @@ namespace PaymentRoutingPoc.UnitTests.Domain.Aggregates;
 
 public class PaymentTest
 {
-    private readonly Card _card = Card.CreateCard("test pan");
+    private readonly Card _card = Card.CreateCard("4111111111111111");
     private readonly Money _total = Money.From((100.00m, "USD"));
     private readonly Merchant _merchant = Merchant.CreateMerchant("test merchant");
     
@@ -39,7 +39,11 @@ public class PaymentTest
             e => e is PaymentSubmittedEvent submittedEvent &&
                  submittedEvent.PaymentId == payment.Id &&
                  submittedEvent.Amount == _total.Amount &&
-                 submittedEvent.Currency == _total.Currency);
+                 submittedEvent.Currency == _total.Currency &&
+                 submittedEvent.CardId == _card.Id &&
+                 submittedEvent.CardLast4 == _card.GetLast4() &&
+                 submittedEvent.MerchantId == _merchant.Id &&
+                 submittedEvent.MerchantName == _merchant.Name);
     }
 
     [Fact]
@@ -50,7 +54,7 @@ public class PaymentTest
         payment.Submit();
 
         // Act
-        payment.MarkAsProcessed("provider-tx-123");
+        payment.MarkAsProcessed("provider-tx-123", "PSP1");
 
         // Assert
         Assert.Equal(PaymentStatus.Processed, payment.Status);
@@ -58,7 +62,9 @@ public class PaymentTest
             e => e is PaymentSucceededEvent succeededEvent &&
                  succeededEvent.PaymentId == payment.Id &&
                  succeededEvent.Amount == _total.Amount &&
-                 succeededEvent.Currency == _total.Currency
+                 succeededEvent.Currency == _total.Currency &&
+                 succeededEvent.ProviderTransactionId == "provider-tx-123" &&
+                 succeededEvent.ProviderName == "PSP1"
                  );
     }
 

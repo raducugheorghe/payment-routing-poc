@@ -6,5 +6,6 @@
   <Project Path="PaymentRoutingPoc.Application/PaymentRoutingPoc.Application.csproj" />
   <Project Path="PaymentRoutingPoc.Domain/PaymentRoutingPoc.Domain.csproj" />
   <Project Path="PaymentRoutingPoc.Infrastructure/PaymentRoutingPoc.Infrastructure.csproj" />
+  <Project Path="PaymentRoutingPoc.Persistence/PaymentRoutingPoc.Persistence.csproj" />
   <Project Path="PaymentRoutingPoc.UnitTests/PaymentRoutingPoc.UnitTests.csproj" />
 </Solution>

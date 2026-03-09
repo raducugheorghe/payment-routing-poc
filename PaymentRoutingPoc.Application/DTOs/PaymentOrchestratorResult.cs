@@ -4,5 +4,6 @@ public class PaymentOrchestratorResult
 {
     public bool IsSuccess { get; set; }
     public string Message { get; set; } = string.Empty;
-    public string ProviderTransactionId { get; set; }
+    public string ProviderTransactionId { get; set; } = string.Empty;
+    public string ProviderName { get; set; } = string.Empty;
 }

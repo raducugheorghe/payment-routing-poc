@@ -1,8 +1,8 @@
 using PaymentRoutingPoc.Application.Commands;
 using PaymentRoutingPoc.Application.DTOs;
-using PaymentRoutingPoc.Infrastructure.EventHandlers;
 using PaymentRoutingPoc.Infrastructure.ExtensionMethods;
 using PaymentRoutingPoc.Infrastructure.Psp;
+using PaymentRoutingPoc.Persistence.Configuration;
 using MediatR;
 
 
@@ -16,7 +16,6 @@ builder.Services.AddLogging();
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssemblyContaining(typeof(CreatePaymentCommand));
-    cfg.RegisterServicesFromAssemblyContaining(typeof(PaymentSucceededEventHandler));
 });
 
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -24,6 +23,8 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 
 var app = builder.Build();
+
+await app.Services.InitializeDatabasesAsync();
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
@@ -87,19 +88,24 @@ app.MapPost("/psp2", (PspPaymentRequest request) =>
     })
     .WithName("ProcessPaymentWithPSP2");
 
-app.MapPost("/api/payments", async (CreatePaymentRequest request, IMediator mediator) =>
+app.MapPost("/api/payments", async (CreatePaymentRequest request, HttpContext httpContext, IMediator mediator) =>
     {
         if(!Guid.TryParse(request.MerchantId, out var merchantId))
         {
             return Results.BadRequest("Invalid MerchantId");
         }
+
+        var idempotencyKey = httpContext.Request.Headers.TryGetValue("Idempotency-Key", out var headerValue)
+            ? headerValue.ToString()
+            : request.IdempotencyKey;
         
         
         var command = new CreatePaymentCommand(
             request.Amount,
             request.Currency,
             request.CardNumber,
-            merchantId);
+            merchantId,
+            idempotencyKey);
         
         var result = await mediator.Send(command);
         
