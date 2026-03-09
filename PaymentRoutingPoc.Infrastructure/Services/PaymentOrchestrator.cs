@@ -68,7 +68,7 @@ public class PaymentOrchestrator : IPaymentOrchestrator
                     _logger);
 
                 pspPaymentResponse = await resiliencePolicy.ExecuteAsync(
-                    async (context, ct) => await mainClient.ProcessPaymentAsync(pspRequest, cancellationToken),
+                    async (context, ct) => await mainClient.ProcessPaymentAsync(pspRequest, ct),
                     cancellationToken);
             }
             

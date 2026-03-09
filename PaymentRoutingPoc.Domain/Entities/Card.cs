@@ -21,4 +21,21 @@ public class Card : EntityBase
 
         return card;
     }
+    
+    public static Card LoadCard(Guid id, string cardNumber)
+    {
+        if (id == Guid.Empty)
+            throw new ArgumentException("Card ID cannot be empty", nameof(id));
+        
+        if (string.IsNullOrWhiteSpace(cardNumber))
+            throw new ArgumentException("Card number cannot be null or empty", nameof(cardNumber));
+
+        var card = new Card
+        {
+            Id = id,
+            CardNumber = cardNumber
+        };
+
+        return card;
+    }
 }
