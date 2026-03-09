@@ -25,6 +25,11 @@ builder.Services.AddInfrastructure(builder.Configuration);
 var app = builder.Build();
 
 await app.Services.InitializeDatabasesAsync();
+using (var scope = app.Services.CreateScope())
+{
+    var referenceDataSeeder = scope.ServiceProvider.GetRequiredService<IReferenceDataSeeder>();
+    await referenceDataSeeder.SeedAsync();
+}
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
@@ -114,4 +119,6 @@ app.MapPost("/api/payments", async (CreatePaymentRequest request, HttpContext ht
     .WithName("ProcessPayment");
 
 app.Run();
+
+public partial class Program;
 

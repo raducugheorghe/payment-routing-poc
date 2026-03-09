@@ -7,7 +7,6 @@ using PaymentRoutingPoc.Persistence.Projections;
 using PaymentRoutingPoc.Persistence.Repositories.EventStore;
 using PaymentRoutingPoc.Persistence.Repositories.ReadModel;
 using PaymentRoutingPoc.Persistence.Serialization;
-using PaymentRoutingPoc.Persistence.Models.Write;
 
 namespace PaymentRoutingPoc.Persistence.Configuration;
 
@@ -77,6 +76,9 @@ public static class PersistenceServiceCollectionExtensions
         services.AddScoped<ProjectionProcessor>();
         services.AddHostedService<ProjectionCatchupBackgroundService>();
 
+        // Register local/dev reference data seeding service.
+        services.AddScoped<IReferenceDataSeeder, ReferenceDataSeeder>();
+
         return services;
     }
 
@@ -92,41 +94,13 @@ public static class PersistenceServiceCollectionExtensions
 
         using var scope = serviceProvider.CreateScope();
 
-        // Migrate write database
-        var writeDb = scope.ServiceProvider.GetRequiredService<WriteDbContext>();
-        await writeDb.Database.MigrateAsync(cancellationToken);
-
-        // Seed command-side reference data used by repositories.
-        const string sampleCardId = "11111111-1111-1111-1111-111111111111";
-        const string sampleCardNumber = "4111111111111111";
-        const string sampleMerchantId = "ffffffff-ffff-ffff-ffff-ffffffffffff";
-        const string sampleMerchantName = "Sample Merchant";
-
-        if (!await writeDb.Cards.AnyAsync(c => c.CardNumber == sampleCardNumber, cancellationToken))
-        {
-            writeDb.Cards.Add(new CardRecord
-            {
-                CardId = sampleCardId,
-                CardNumber = sampleCardNumber,
-                CreatedAt = DateTime.UtcNow
-            });
-        }
-
-        if (!await writeDb.Merchants.AnyAsync(m => m.MerchantId == sampleMerchantId, cancellationToken))
-        {
-            writeDb.Merchants.Add(new MerchantRecord
-            {
-                MerchantId = sampleMerchantId,
-                Name = sampleMerchantName,
-                CreatedAt = DateTime.UtcNow
-            });
-        }
-
-        await writeDb.SaveChangesAsync(cancellationToken);
-
         // Migrate read database
         var readDb = scope.ServiceProvider.GetRequiredService<ReadDbContext>();
         await readDb.Database.MigrateAsync(cancellationToken);
+
+        // Migrate write database
+        var writeDb = scope.ServiceProvider.GetRequiredService<WriteDbContext>();
+        await writeDb.Database.MigrateAsync(cancellationToken);
 
         // Ensure checkpoint table exists in read model DB even when older migrations are applied.
         await readDb.Database.ExecuteSqlRawAsync(

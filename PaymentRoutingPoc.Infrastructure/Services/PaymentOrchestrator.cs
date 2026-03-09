@@ -112,8 +112,7 @@ public class PaymentOrchestrator : IPaymentOrchestrator
             .AddFallback(new FallbackStrategyOptions<PspPaymentResponse>
             {
                 ShouldHandle = new PredicateBuilder<PspPaymentResponse>()
-                    .HandleInner<TimeoutException>()
-                    .HandleInner<HttpRequestException>()
+                    .Handle<Exception>()
                     .HandleResult(r => !r.IsSuccess),
                 FallbackAction = async (context) =>
                 {

@@ -1,4 +1,4 @@
-namespace PaymentRoutingPoc.Persistence.Models.Write;
+namespace PaymentRoutingPoc.Persistence.Models.Read;
 
 /// <summary>
 /// Reference card data used by command-side validation.

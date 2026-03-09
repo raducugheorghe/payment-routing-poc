@@ -4,10 +4,11 @@ using Entities;
 using Events;
 using ValueObjects;
 
-public class Payment: EntityBase, IEventSourcedAggregate
+public class Payment: IEventSourcedAggregate
 {
     private readonly List<IDomainEvent> _domainEvents = [];
-    
+
+    public Guid Id { get; private set; } = Guid.Empty;
     public Money Total { get; private set; } = null!;
     public Card Card { get; private set; } = null!;
     public Merchant Merchant { get; private set; } = null!;

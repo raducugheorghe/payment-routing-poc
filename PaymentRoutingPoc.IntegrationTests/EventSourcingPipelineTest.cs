@@ -10,7 +10,7 @@ using PaymentRoutingPoc.Persistence.Projections;
 using PaymentRoutingPoc.Persistence.Repositories.EventStore;
 using PaymentRoutingPoc.Persistence.Serialization;
 
-namespace PaymentRoutingPoc.UnitTests.Persistence.Integration;
+namespace PaymentRoutingPoc.IntegrationTests.Persistence.Integration;
 
 public class EventSourcingPipelineTest
 {

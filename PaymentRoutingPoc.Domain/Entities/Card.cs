@@ -1,8 +1,9 @@
 namespace PaymentRoutingPoc.Domain.Entities;
 
-public class Card : EntityBase
+public class Card
 {
     // card entity with Id, CardNumber, etc
+    public Guid Id { get; private set; } = Guid.Empty;
     public string CardNumber { get; private set; }
 
     private Card() {

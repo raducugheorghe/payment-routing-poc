@@ -1,7 +1,8 @@
 namespace PaymentRoutingPoc.Domain.Entities;
 
-public class Merchant: EntityBase
+public class Merchant
 {
+    public Guid Id { get; private set; } = Guid.Empty;
     public string Name { get; private set; }
 
     private Merchant()

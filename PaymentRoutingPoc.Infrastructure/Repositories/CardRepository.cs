@@ -10,16 +10,16 @@ using PaymentRoutingPoc.Persistence.DbContexts;
 /// </summary>
 public class CardRepository : ICardRepository
 {
-    private readonly WriteDbContext _writeDb;
+    private readonly ReadDbContext _readDb;
 
-    public CardRepository(WriteDbContext writeDb)
+    public CardRepository(ReadDbContext readDb)
     {
-        _writeDb = writeDb ?? throw new ArgumentNullException(nameof(writeDb));
+        _readDb = readDb ?? throw new ArgumentNullException(nameof(readDb));
     }
 
     public async Task<Card?> GetByCardNumberAsync(string cardNumber, CancellationToken cancellationToken = default)
     {
-        var cardRecord = await _writeDb.Cards
+        var cardRecord = await _readDb.Cards
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.CardNumber == cardNumber, cancellationToken);
 

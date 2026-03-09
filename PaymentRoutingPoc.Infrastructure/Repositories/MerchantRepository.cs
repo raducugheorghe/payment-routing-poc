@@ -10,16 +10,16 @@ using PaymentRoutingPoc.Persistence.DbContexts;
 /// </summary>
 public class MerchantRepository : IMerchantRepository
 {
-    private readonly WriteDbContext _writeDb;
+    private readonly ReadDbContext _readDb;
 
-    public MerchantRepository(WriteDbContext writeDb)
+    public MerchantRepository(ReadDbContext readDb)
     {
-        _writeDb = writeDb ?? throw new ArgumentNullException(nameof(writeDb));
+        _readDb = readDb ?? throw new ArgumentNullException(nameof(readDb));
     }
 
     public async Task<Merchant?> GetByIdAsync(Guid merchantId, CancellationToken cancellationToken = default)
     {
-        var merchantRecord = await _writeDb.Merchants
+        var merchantRecord = await _readDb.Merchants
             .AsNoTracking()
             .FirstOrDefaultAsync(m => m.MerchantId == merchantId.ToString(), cancellationToken);
 

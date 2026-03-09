@@ -24,16 +24,6 @@ public class WriteDbContext : DbContext
     /// </summary>
     public DbSet<Snapshot> Snapshots { get; set; } = null!;
 
-    /// <summary>
-    /// Card reference data used for command validation.
-    /// </summary>
-    public DbSet<CardRecord> Cards { get; set; } = null!;
-
-    /// <summary>
-    /// Merchant reference data used for command validation.
-    /// </summary>
-    public DbSet<MerchantRecord> Merchants { get; set; } = null!;
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -131,51 +121,5 @@ public class WriteDbContext : DbContext
                 .HasDatabaseName("idx_snapshot_stream_id");
         });
 
-        // Configure CardRecord
-        modelBuilder.Entity<CardRecord>(entity =>
-        {
-            entity.ToTable("Cards");
-
-            entity.HasKey(e => e.CardId);
-
-            entity.Property(e => e.CardId)
-                .HasMaxLength(36)
-                .IsRequired();
-
-            entity.Property(e => e.CardNumber)
-                .HasMaxLength(19)
-                .IsRequired();
-
-            entity.Property(e => e.CreatedAt)
-                .IsRequired()
-                .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-            entity.HasIndex(e => e.CardNumber)
-                .IsUnique()
-                .HasDatabaseName("idx_cards_number");
-        });
-
-        // Configure MerchantRecord
-        modelBuilder.Entity<MerchantRecord>(entity =>
-        {
-            entity.ToTable("Merchants");
-
-            entity.HasKey(e => e.MerchantId);
-
-            entity.Property(e => e.MerchantId)
-                .HasMaxLength(36)
-                .IsRequired();
-
-            entity.Property(e => e.Name)
-                .HasMaxLength(255)
-                .IsRequired();
-
-            entity.Property(e => e.CreatedAt)
-                .IsRequired()
-                .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-            entity.HasIndex(e => e.Name)
-                .HasDatabaseName("idx_merchants_name");
-        });
     }
 }
